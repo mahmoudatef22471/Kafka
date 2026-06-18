@@ -1,0 +1,67 @@
+services:
+  # --- KAFKA NODE 1 ---
+  kafka1:
+    image: apache/kafka:4.0.0
+    container_name: kafka1
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka1:9094,2@kafka2:9094,3@kafka3:9094'
+      KAFKA_LISTENERS: 'INSIDE://:9093,OUTSIDE://:9092,CONTROLLER://:9094'
+      KAFKA_ADVERTISED_LISTENERS: 'INSIDE://kafka1:9093,OUTSIDE://localhost:9092'
+      # FIXED: Tell Kafka to use the INSIDE listener for broker-to-broker replication sync
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'INSIDE'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      CLUSTER_ID: 'MkU3OEVBNTcwNTJDRDRCMEY'
+
+  # --- KAFKA NODE 2 ---
+  kafka2:
+    image: apache/kafka:4.0.0
+    container_name: kafka2
+    ports:
+      - "9095:9095"
+    environment:
+      KAFKA_NODE_ID: 2
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka1:9094,2@kafka2:9094,3@kafka3:9094'
+      KAFKA_LISTENERS: 'INSIDE://:9093,OUTSIDE://:9095,CONTROLLER://:9094'
+      KAFKA_ADVERTISED_LISTENERS: 'INSIDE://kafka2:9093,OUTSIDE://localhost:9095'
+      # FIXED: Tell Kafka to use the INSIDE listener for broker-to-broker replication sync
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'INSIDE'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      CLUSTER_ID: 'MkU3OEVBNTcwNTJDRDRCMEY'
+
+  # --- KAFKA NODE 3 ---
+  kafka3:
+    image: apache/kafka:4.0.0
+    container_name: kafka3
+    ports:
+      - "9096:9096"
+    environment:
+      KAFKA_NODE_ID: 3
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka1:9094,2@kafka2:9094,3@kafka3:9094'
+      KAFKA_LISTENERS: 'INSIDE://:9093,OUTSIDE://:9096,CONTROLLER://:9094'
+      KAFKA_ADVERTISED_LISTENERS: 'INSIDE://kafka3:9093,OUTSIDE://localhost:9096'
+      # FIXED: Tell Kafka to use the INSIDE listener for broker-to-broker replication sync
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'INSIDE'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      CLUSTER_ID: 'MkU3OEVBNTcwNTJDRDRCMEY'
+
+  # --- KAFDROP UI ---
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    container_name: kafdrop
+    depends_on:
+      - kafka1
+      - kafka2
+      - kafka3
+    ports:
+      - "9002:9000"
+    environment:
+      KAFKA_BROKERCONNECT: "kafka1:9093,kafka2:9093,kafka3:9093"
