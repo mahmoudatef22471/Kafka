@@ -1,0 +1,12 @@
+services:
+  spark:
+    image: quay.io/jupyter/all-spark-notebook:spark-3.5.3
+    ports:
+      - "8888:8888"
+      - "4040:4040"
+      - "18180:18080"
+    environment:
+      - PYSPARK_PYTHON=python3
+      - PYSPARK_DRIVER_PYTHON_OPTS='notebook --ip=0.0.0.0 --no-browser --allow-root'
+    volumes:
+      - ./ITI:/home/ITI
